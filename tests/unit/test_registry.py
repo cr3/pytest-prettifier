@@ -91,3 +91,14 @@ def test_registry_get_error():
     """Getting a non-existing entry from a registry should raise."""
     with pytest.raises(KeyError):
         registry_get("group", "name", {})
+
+
+@pytest.mark.parametrize(
+    "group,name",
+    [
+        ("pytest_prettifier", "bytes"),
+    ],
+)
+def test_registry_get_setup(group, name):
+    """Getting from the registry should lookup entry points in setup.py."""
+    registry_get(group, name)
