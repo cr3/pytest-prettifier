@@ -13,6 +13,7 @@ from pytest_prettifier.prettifier import (
     PrettifierPlugin,
     attrs_prettifier,
     bytes_prettifier,
+    datetime_prettifier,
     dict_prettifier,
     exception_prettifier,
     list_prettifier,
@@ -227,6 +228,17 @@ def test_attrs_prettifier(prettifier, obj, string):
 def test_bytes_prettifier(prettifier, obj, string):
     """Prettifying bytes should return it with the `b` prefix."""
     assert bytes_prettifier.prettify(prettifier, obj) == string
+
+
+@pytest.mark.parametrize(
+    "obj, string",
+    [
+        (dt(2000, 1, 1), "<2000-01-01T00:00:00.000000+00:00>"),
+    ],
+)
+def test_datetime_prettifier(prettifier, obj, string):
+    """Prettifying a datetime should return the encoded timestamp."""
+    assert datetime_prettifier.prettify(prettifier, obj) == string
 
 
 @pytest.mark.parametrize(

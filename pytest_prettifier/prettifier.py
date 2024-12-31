@@ -34,9 +34,10 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
-from attrs import define, field, has, asdict
+from attrs import asdict, define, field, has
 
 from pytest_prettifier.registry import registry_load
+from pytest_prettifier.timestamp import encode_timestamp
 
 
 def prettify(obj, indent=2, newline="\n", level=0):
@@ -93,6 +94,33 @@ attrs_prettifier = PrettifierPlugin(
 bytes_prettifier = PrettifierPlugin(bytes, lambda p, obj, level=0: p.prettify_record(f"{obj!r}", level))
 
 
+datetime_prettifier = PrettifierPlugin(
+    datetime,
+    lambda p, obj, level=0: p.prettify_record(f"<{encode_timestamp(obj)}>", level),
+)
+
+dict_prettifier = PrettifierPlugin(
+    (dict, Mapping, UserDict),
+    lambda p, obj, level=0: p.prettify_fields(
+        "{}{{".format(
+            "" if isinstance(obj, dict) else f"{obj.__class__.__name__}(",
+        ),
+        ", ",
+        "}}{}".format(
+            "" if isinstance(obj, dict) else ")",
+        ),
+        sorted(
+            "{key}: {value}".format(
+                key=p.prettify(key, level + 1).rstrip(),
+                value=p.prettify(value, level + 1).lstrip(),
+            )
+            for key, value in obj.items()
+        ),
+        level,
+    ),
+)
+
+
 try:
     _exception_type = BaseException
 except NameError:  # pragma: no cover
@@ -116,28 +144,6 @@ exception_prettifier = PrettifierPlugin(
         level,
     ).rstrip()
     + p.prettify(getattr(obj, "args", ()), level).lstrip(),
-)
-
-
-dict_prettifier = PrettifierPlugin(
-    (dict, Mapping, UserDict),
-    lambda p, obj, level=0: p.prettify_fields(
-        "{}{{".format(
-            "" if isinstance(obj, dict) else f"{obj.__class__.__name__}(",
-        ),
-        ", ",
-        "}}{}".format(
-            "" if isinstance(obj, dict) else ")",
-        ),
-        sorted(
-            "{key}: {value}".format(
-                key=p.prettify(key, level + 1).rstrip(),
-                value=p.prettify(value, level + 1).lstrip(),
-            )
-            for key, value in obj.items()
-        ),
-        level,
-    ),
 )
 
 

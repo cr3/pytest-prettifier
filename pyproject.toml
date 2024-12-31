@@ -12,6 +12,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.9"
 attrs = "^24.3.0"
+python-dateutil = "^2.9.0.post0"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.3"
@@ -35,6 +36,7 @@ sphinx-rtd-theme = "^1.2.0"
 
 [tool.poetry.plugins."pytest_prettifier"]
 bytes = "pytest_prettifier.prettifier:bytes_prettifier"
+datetime = "pytest_prettifier.prettifier:datetime_prettifier"
 dict = "pytest_prettifier.prettifier:dict_prettifier"
 exception = "pytest_prettifier.prettifier:exception_prettifier"
 list = "pytest_prettifier.prettifier:list_prettifier"

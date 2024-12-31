@@ -1,4 +1,5 @@
 """Entry points based registry management."""
+
 import contextlib
 from importlib.metadata import entry_points
 
