@@ -1,107 +1,123 @@
-Python Template
-===============
+pytest-prettifier
+=================
 
-Repository template to bootstrap a Python project.
+`Pytest <http://pytest.org>`_ fixture to prettify test parameters.
 
-Benefits of this template
--------------------------
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://github.com/cr3/pytest-prettifier/blob/master/LICENSE
+   :alt: License
+.. image:: https://img.shields.io/pypi/v/pytest-prettifier.svg
+   :target: https://pypi.python.org/pypi/pytest-prettifier/
+   :alt: PyPI
+.. image:: https://img.shields.io/github/issues-raw/cr3/pytest-prettifier.svg
+   :target: https://github.com/cr3/pytest-prettifier/issues
+   :alt: Issues
 
-* Installs the expected Python version under ``.venv/``.
-* Installs Python dependencies also under ``.venv/``.
-* Pins dependency versions in ``poetry.lock``.
-* Provides default template for pull requests.
-* Checks for syntax and format on pull requests.
-* Runs tests on pull requests.
-* Pushes documentation to GitHub pages also when creating tags.
-* Includes settings for editors and some specifically for VSCode.
+Requirements
+------------
 
-Creating a new repository
--------------------------
+You will need the following prerequisites to use pytest-prettifier:
 
-To create the repository for a new project:
+- Python 3.9, 3.10, 3.11, 3.12, 3.13
 
-1. On `GitHub`_, navigate to the main page of this repository.
-2. Above the file list, click *Use this template*.
-3. Select *Create a new repository*.
-4. Follow the usual steps.
+Installation
+------------
 
-.. _GitHub: https://github.com/cr3
+To install pytest-prettifier:
 
-Configuring the new repository
-------------------------------
+.. code-block:: bash
 
-In GitHub -> Settings:
+  $ pip install pytest-prettifier
 
-1. General:
+Usage
+-----
 
-   * Uncheck ``Wikis``
-   * Uncheck ``Projects``
-   * Check ``Automatically delete head branches``
+You can see the benefits when using test parameters:
 
-2. Branch protection rules:
+.. code-block:: python
 
-   * Branch name pattern: ``main``
-   * Check ``Require a pull request before merging``
-   * Check ``Require review from Code Owners``
-   * Check ``Require status checks to pass before merging``
-   * Click on ``Create``
+  @pytest.mark.parametrize('x', [
+      b'a',
+  ])
+  def test_x(x):
+      assert x == b'a'
 
-3. Another branch protection rules:
+Without the ``prettifier`` fixture:
 
-   * Branch name pattern: ``gh-pages``
-   * Check ``Allow force pushes``
-   * Click on ``Create``
+.. code-block:: console
 
-4. Create branch named ``gh-pages``.
+  > pytest -s -v
+  test_file.py::test_x[a] PASSED
 
-In the source:
+With the ``prettifier`` fixture:
 
-1. Rewrite this ``README.rst``.
-2. Update the ``LICENSE.rst``.
-3. Replace "changeme" with your project details in:
+.. code-block:: console
 
-   * ``docs/api.rst``
-   * ``docs/conf.py``
-   * ``docs/modules.rst``
-   * ``pyproject.toml``
-   * ``CONTRIBUTING.rst``
+  > pytest -s -v
+  test_file.py::test_x[b'a'] PASSED
 
-4. Rename the directory "changeme" with your project name.
+Here are some of the plugins available by default:
 
-Using the new repository
-------------------------
+* ``bytes`` output as ``b'bytes'``.
+* ``datetime`` output as ``<2000-01-01T00:00:00.000000+00:00>``.
+* ``dict`` output as ``{'a': 1}``.
+* ``exception`` output as ``KeyError('key')``.
+* ``list`` output as ``[1, 'a']``.
+* ``mock`` output as ``Mock(call_count=0)``.
+* ``object`` output as ``1``, ``""``, ``[]``, ``{}``, etc.
+* ``re`` output as ``<test>``.
+* ``set`` output as ``set([])``.
+* ``str`` output as ``'str'``.
+* ``timedelta`` output as ``1.0`` in seconds.
+* ``tuple`` output as ``()``.
+* ``type`` output as ``int``, ``Exception``, etc.
 
-1. ``make setup`` to setup the Python environment with ``conda`` and install the poetry environment.
-2. ``make check`` to check syntax and formatting.
-3. ``make test`` to run tests.
-4. ``make docs`` to build documentation - requires first running ``poetry install --with docs``.
-5. ``poetry add [package]`` to install ``[package]`` in ``.venv/``, add it in ``pyproject.toml`` and pin its version in ``poetry.lock``.
-
-Maintaining the new repository
-------------------------------
-
-1. In the new repository, add the remote template repository - only needs to be done once:
-
-   .. code-block:: text
-
-      > git remote add template https://github.com/cr3/python-template.git
-
-2. Fetch the latest changes and review the log:
-
-   .. code-block:: text
-
-      > git fetch template
-      > git log template/main
-      ...
-
-3. Cherry pick each revision from the above log command:
-
-   .. code-block:: text
-
-      > git cherry-pick [revno]
-
-
-References
+Extensions
 ----------
 
-* `Creating a repository from a template <https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template>`__
+The ``prettifier`` fixture can be extended with custom plugins:
+
+.. code-block:: python
+
+  from pytest_prettifier import PrettifierPlugin
+
+  bool_prettifier = PrettifierPlugin(
+      bool,
+      lambda p, v, level=0: p.prettify_record("is true" if v else "is false", level),
+  )
+
+Then, add it to the ``pyproject.toml`` file of your project:
+
+.. code-block:: text
+
+  [tool.poetry.plugins."pytest_prettifier"]
+  bool = "your_project.prettifier:bool_prettifier"
+
+When you use boolean parameters:
+
+.. code-block:: python
+
+  @pytest.mark.parametrize('x', [
+      True,
+      False,
+  ])
+  def test_x(x):
+      assert isinstance(x, bool)
+
+The parameters will be prettified:
+
+.. code-block:: console
+
+  > pytest -s -v
+  test_file.py::test_x[is true] PASSED
+  test_file.py::test_x[is false] PASSED
+
+
+Resources
+---------
+
+- `Documentation <https://cr3.github.io/pytest-prettifier/>`_
+- `Release Notes <http://github.com/cr3/pytest-prettifier/blob/master/CHANGES.rst>`_
+- `Issue Tracker <http://github.com/cr3/pytest-prettifier/issues>`_
+- `Source Code <http://github.com/cr3/pytest-prettifier/>`_
+- `PyPi <https://pypi.org/project/pytest-prettifier/>`_

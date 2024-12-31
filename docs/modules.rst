@@ -1,5 +1,7 @@
-modules
-=======
+pytest_prettifier
+=================
 
-..
-    Generate this file with ``sphinx-apidoc --force --implicit-namespaces -o docs changeme``
+.. toctree::
+   :maxdepth: 4
+
+   pytest_prettifier
