@@ -58,6 +58,11 @@ def test_registry_add_existing():
     assert registry["group"]["name"]
 
 
+def test_registry_remove_empty():
+    """Removing from an empty registry should do nothing."""
+    registry_remove("group", "name1", None)
+
+
 def test_registry_remove_existing():
     """Removing an existing entry from a registry should remove it."""
     registry = registry_add("group", "name1", True)

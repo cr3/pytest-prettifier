@@ -1,12 +1,13 @@
 """Test."""
+
 import re
 from collections.abc import Mapping, Sequence, Set
 from datetime import datetime as dt
 from datetime import timedelta as td
 from unittest.mock import Mock
 
-from attrs import make_class
 import pytest
+from attrs import make_class
 
 from pytest_prettifier.prettifier import (
     Prettifier,
@@ -78,97 +79,83 @@ def prettifier():
         ([1], "[1]"),
         (
             [1, 2],
-            "\n".join(
-                [
-                    "[",
-                    "  1, ",
-                    "  2",
-                    "]",
-                ]
-            ),
+            "\n".join([
+                "[",
+                "  1, ",
+                "  2",
+                "]",
+            ]),
         ),
         (
             [1, [2, [3]]],
-            "\n".join(
-                [
-                    "[",
-                    "  1, ",
-                    "  [",
-                    "    2, ",
-                    "    [3]",
-                    "  ]",
-                    "]",
-                ]
-            ),
+            "\n".join([
+                "[",
+                "  1, ",
+                "  [",
+                "    2, ",
+                "    [3]",
+                "  ]",
+                "]",
+            ]),
         ),
         ({}, "{}"),
         ({"a": 1}, "{'a': 1}"),
         (
             {"a": 1, "b": 2},
-            "\n".join(
-                [
-                    "{",
-                    "  'a': 1, ",
-                    "  'b': 2",
-                    "}",
-                ]
-            ),
+            "\n".join([
+                "{",
+                "  'a': 1, ",
+                "  'b': 2",
+                "}",
+            ]),
         ),
         (
             [1, {"a": 2, "b": 3}],
-            "\n".join(
-                [
-                    "[",
-                    "  1, ",
-                    "  {",
-                    "    'a': 2, ",
-                    "    'b': 3",
-                    "  }",
-                    "]",
-                ]
-            ),
+            "\n".join([
+                "[",
+                "  1, ",
+                "  {",
+                "    'a': 2, ",
+                "    'b': 3",
+                "  }",
+                "]",
+            ]),
         ),
         (
             {"a": 1, ("b", "c"): [2, 3]},
-            "\n".join(
-                [
-                    "{",
-                    "  'a': 1, ",
-                    "  (",
-                    "    'b', ",
-                    "    'c'",
-                    "  ): [",
-                    "    2, ",
-                    "    3",
-                    "  ]",
-                    "}",
-                ]
-            ),
+            "\n".join([
+                "{",
+                "  'a': 1, ",
+                "  (",
+                "    'b', ",
+                "    'c'",
+                "  ): [",
+                "    2, ",
+                "    3",
+                "  ]",
+                "}",
+            ]),
         ),
         (make_class("Test", [])(), "Test()"),
         (make_class("Test", ["a"])(1), "Test(a=1)"),
         (make_class("Test", ["a"])({1}), "Test(a=set([1]))"),
         (
             make_class("Test", ["a", "b"])(1, 2),
-            "\n".join(
-                [
-                    "Test(",
-                    "  a=1, ",
-                    "  b=2",
-                    ")",
-                ]
-            ),
+            "\n".join([
+                "Test(",
+                "  a=1, ",
+                "  b=2",
+                ")",
+            ]),
         ),
         (
             make_class("Test", ["a"])({1, 2}),
-            "\n".join(
-                [
-                    "Test(a=set([",
-                    "    1, ",
-                    "    2",
-                    "  ]))",
-                ]
-            ),
+            "\n".join([
+                "Test(a=set([",
+                "    1, ",
+                "    2",
+                "  ]))",
+            ]),
         ),
     ],
 )

@@ -25,14 +25,12 @@ def decode_timestamp(timestamp):
     """
     # If timestamp is not already a datetime, try to parse
     if not isinstance(timestamp, datetime):
-        parsed_timestamp = parse(timestamp)
-        if parsed_timestamp is None:
-            raise ValueError(f"{timestamp!r} is not a valid timestamp")
-
-        timestamp = parsed_timestamp
+        timestamp = parse(timestamp)
 
     if timestamp.tzinfo is None:
         timestamp = timestamp.replace(tzinfo=tzutc)
+    elif timestamp.tzinfo != tzutc:
+        timestamp = timestamp.astimezone(tzutc)
 
     return timestamp
 
