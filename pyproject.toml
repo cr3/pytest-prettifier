@@ -11,12 +11,12 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-attrs = "^24.3.0"
 python-dateutil = "^2.9.0.post0"
+attrs = "^24.3.0"
+pytest = "^8.3.4"
 
 [tool.poetry.group.test.dependencies]
-coverage = "^7.2.3"
-pytest = "^7.2.2"
+coverage = "^7.6.10"
 
 [tool.poetry.group.check]
 optional = true
@@ -133,7 +133,7 @@ source = [
 ]
 
 [tool.coverage.report]
-fail_under = 90
+fail_under = 100
 show_missing = true
 
 [tool.coverage.run]

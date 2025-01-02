@@ -4,7 +4,7 @@ import re
 from collections.abc import Mapping, Sequence, Set
 from datetime import datetime as dt
 from datetime import timedelta as td
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from attrs import make_class
@@ -20,6 +20,7 @@ from pytest_prettifier.prettifier import (
     list_prettifier,
     mock_prettifier,
     object_prettifier,
+    pprettify,
     prettify,
     re_prettifier,
     set_prettifier,
@@ -162,6 +163,13 @@ def prettifier():
 def test_prettify(obj, string):
     """Prettifying an object should return a pretty string."""
     assert prettify(obj) == string
+
+
+@patch("sys.stdout")
+def test_pprettify(stdout):
+    """Printing a prettified object should write to stdout."""
+    pprettify([])
+    assert stdout.write.call_args[0][0] == "[]\n"
 
 
 @pytest.mark.parametrize(
@@ -368,3 +376,58 @@ def test_tuple_prettifier(prettifier, obj, string):
 def test_type_prettifier(prettifier, obj, string):
     """Prettifying a type should return its name with module when relevant."""
     assert type_prettifier.prettify(prettifier, obj) == string
+
+
+def test_prettifier_get_plugin_priority():
+    """Getting a plugin should prioritize the most specific type."""
+    prettifier = Prettifier(
+        registry={
+            "pytest_prettifier": {
+                "obj": PrettifierPlugin(object, lambda *_: "obj"),
+                "str": PrettifierPlugin(str, lambda *_: "str"),
+            },
+        }
+    )
+    plugin = prettifier.get_plugin("")
+    result = plugin.prettify()
+    assert result == "str"
+
+
+def test_prettifier_get_plugin_no_plugins():
+    """Getting a plugin should raise when there are none."""
+    prettifier = Prettifier(registry={})
+    with pytest.raises(KeyError) as e:
+        prettifier.get_plugin([])
+
+    assert "No plugins" in e.value.args[0]
+
+
+def test_prettifier_get_plugin_no_match():
+    """Getting a plugin should raise when there are no matches."""
+    prettifier = Prettifier(
+        registry={
+            "pytest_prettifier": {
+                "str": PrettifierPlugin(str, lambda *_: None),
+            },
+        }
+    )
+    with pytest.raises(KeyError) as e:
+        prettifier.get_plugin([])
+
+    assert "No match" in e.value.args[0]
+
+
+def test_prettifier_get_plugin_more_than_one():
+    """Getting a plugin should raise when there are multiple matches."""
+    prettifier = Prettifier(
+        registry={
+            "pytest_prettifier": {
+                "str1": PrettifierPlugin(str, lambda *_: None),
+                "str2": PrettifierPlugin(str, lambda *_: None),
+            },
+        }
+    )
+    with pytest.raises(KeyError) as e:
+        prettifier.get_plugin("")
+
+    assert "More than one" in e.value.args[0]

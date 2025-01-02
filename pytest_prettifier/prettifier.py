@@ -28,6 +28,7 @@ them under the pytest_prettifier group in setup.py entry points.
 # require lots of string manipulation to preserve the indentation level.
 
 import re
+import sys
 from collections import UserDict, UserList, UserString
 from collections.abc import Mapping, Sequence, Set
 from contextlib import suppress
@@ -48,7 +49,8 @@ def prettify(obj, indent=2, newline="\n", level=0):
 
 def pprettify(obj, *args, **kwargs):
     """Print a prettified Python object to stdout."""
-    print(prettify(obj, *args, **kwargs))
+    output = prettify(obj, *args, **kwargs)
+    sys.stdout.write(f"{output}\n")
 
 
 @define(frozen=True)

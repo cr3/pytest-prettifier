@@ -6,11 +6,7 @@ from importlib.metadata import entry_points
 
 def get_entry_points(group):
     """Get the list of pytest_prettifier entry points."""
-    try:
-        return entry_points().select(group=group)
-    except AttributeError:
-        # Backward compatibility with Python 3.8.
-        return entry_points().get(group, [])
+    return entry_points().select(group=group)
 
 
 def registry_load(group, registry=None):
